@@ -1,0 +1,22 @@
+@owner: Loupe
+@stability: stable
+@since: 2026-06-15
+@reviewed: 2026-06-15
+
+Feature: Loupe CLI Entrypoint
+  "Runs the loupe command-line interface as a single binary."
+
+  Provides:
+    - main.RunLoupe @source("symbol:main")
+
+  Consumes:
+    - cli.Run
+
+  Invariants:
+    - The binary MUST delegate command behavior to cli.Run.
+    - The binary MUST exit with status 1 when cli.Run reports an error.
+
+  Scenario (negative): CLI error exits non-zero
+    Given cli.Run returns an error
+    When the binary exits
+    Then the process exits with status 1

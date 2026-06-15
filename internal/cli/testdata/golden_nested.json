@@ -1,0 +1,40 @@
+{
+  "path": "<ROOT>",
+  "name": "<ROOT_NAME>",
+  "type": "directory",
+  "size_bytes": "<DIR_SIZE>",
+  "modified_unix": "<DIR_MODIFIED>",
+  "permissions": "755",
+  "entry_count": 2,
+  "entries": [
+    {
+      "path": "<ROOT>/README.md",
+      "name": "README.md",
+      "type": "file",
+      "size_bytes": 6,
+      "modified_unix": 1700000001,
+      "permissions": "644",
+      "extension": ".md"
+    },
+    {
+      "path": "<ROOT>/src",
+      "name": "src",
+      "type": "directory",
+      "size_bytes": "<DIR_SIZE>",
+      "modified_unix": "<DIR_MODIFIED>",
+      "permissions": "755",
+      "entry_count": 1,
+      "entries": [
+        {
+          "path": "<ROOT>/src/main.go",
+          "name": "main.go",
+          "type": "file",
+          "size_bytes": 12,
+          "modified_unix": 1700000002,
+          "permissions": "644",
+          "extension": ".go"
+        }
+      ]
+    }
+  ]
+}

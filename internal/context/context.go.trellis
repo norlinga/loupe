@@ -1,0 +1,40 @@
+@owner: Loupe
+@stability: stable
+@since: 2026-06-15
+@reviewed: 2026-06-15
+
+Feature: Observation Context
+  "Adds project-level semantic context to an observed node."
+
+  Provides:
+    - context.Enrich @source("symbol:Enrich")
+    - context.Options @source("symbol:Options")
+
+  Consumes:
+    - notes.ReadNearest
+    - schema.Context
+    - schema.Node
+
+  Invariants:
+    - Context enrichment MUST NOT change base node metadata.
+    - VCS detection SHOULD report git when the nearest project root contains .git.
+    - Project type detection MUST use marker files only.
+    - Recently modified paths MUST be relative to the project root.
+    - Recently modified paths MUST be sorted newest first with lexical order as a tie-breaker.
+    - Recently modified paths MUST be capped to the configured limit.
+    - Agent notes MUST be omitted when no valid notes file exists.
+
+  Scenario (happy-path): Go project
+    Given a project root containing go.mod
+    When context enrichment runs
+    Then project_type is go
+
+  Scenario (happy-path): Recently modified order
+    Given several files modified inside the recent window
+    When context enrichment runs
+    Then recently_modified contains the newest relative paths first up to the limit
+
+  Scenario (negative): Missing notes
+    Given no .loupe/notes.json exists
+    When context enrichment runs
+    Then agent_notes is absent from the encoded context

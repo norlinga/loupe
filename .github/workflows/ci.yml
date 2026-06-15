@@ -1,0 +1,23 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - run: make test
+      - name: Trellis lint
+        run: |
+          if command -v trellis >/dev/null 2>&1; then
+            make trellis-lint
+          else
+            echo "::warning::trellis is not installed on this runner; skipping sidecar lint"
+          fi
+      - run: make build

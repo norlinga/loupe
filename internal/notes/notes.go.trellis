@@ -1,0 +1,29 @@
+@owner: Loupe
+@stability: stable
+@since: 2026-06-15
+@reviewed: 2026-06-15
+
+Feature: Agent Notes
+  "Discovers and reads agent-authored .loupe/notes.json context."
+
+  Provides:
+    - notes.ReadNearest @source("symbol:ReadNearest")
+
+  Consumes:
+    - schema.AgentNote
+
+  Invariants:
+    - Notes discovery MUST walk upward from the observed path to the nearest git root.
+    - Notes MUST be read only from .loupe/notes.json at the project root.
+    - Malformed notes JSON MUST be skipped without returning an error.
+    - Returned notes MUST preserve note fields verbatim.
+
+  Scenario (happy-path): Valid notes
+    Given a valid project-root .loupe/notes.json
+    When notes are read
+    Then the note array is returned
+
+  Scenario (negative): Malformed notes
+    Given a malformed notes file
+    When notes are read
+    Then no notes are returned and observation continues

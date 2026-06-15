@@ -1,0 +1,49 @@
+@owner: Loupe
+@stability: stable
+@since: 2026-06-15
+@reviewed: 2026-06-15
+
+Feature: Filesystem Observation
+  "Observes local filesystem paths through OS APIs and returns schema nodes."
+
+  Provides:
+    - observe.Observe @source("symbol:Observe")
+    - observe.Options @source("symbol:Options")
+
+  Consumes:
+    - schema.Node
+
+  Invariants:
+    - Observation MUST use Go filesystem APIs rather than subprocess output.
+    - File and symlink observations MUST NOT include entries.
+    - Directory observations MUST represent recursion as nested entries.
+    - A directory depth of 0 MUST include directory metadata without child entries.
+    - Directory entries MUST be emitted in lexical filename order.
+    - Type filters MUST NOT prevent traversal needed to expose matching descendants.
+    - Hidden entries MUST be excluded when NoHidden is set.
+    - Unreadable descendants MUST fail the observation rather than returning partial JSON.
+    - Broken symlinks MUST still be reported as symlink nodes with their unresolved target path.
+
+  OutOfScope:
+    - Querying, sorting, or transforming results beyond simple observation filters.
+    - Remote filesystem access.
+
+  Scenario (happy-path): Nested depth
+    Given a directory tree and depth 2
+    When the tree is observed
+    Then child directories contain their own nested entries up to that depth
+
+  Scenario (happy-path): Filtered descendants
+    Given a file type filter and a matching file inside a subdirectory
+    When the tree is observed
+    Then the containing directory remains in the nested output so the file is reachable
+
+  Scenario (negative): Missing path
+    Given the observed path does not exist
+    When observation runs
+    Then an error is returned instead of a partial node
+
+  Scenario (negative): Unreadable descendant
+    Given a descendant cannot be inspected
+    When observation runs
+    Then an error is returned instead of partial output

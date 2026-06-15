@@ -1,0 +1,25 @@
+@owner: Loupe
+@stability: stable
+@since: 2026-06-15
+@reviewed: 2026-06-15
+
+Feature: Version Metadata
+  "Exposes build-stamped version metadata for CLI output."
+
+  Provides:
+    - version.String @source("symbol:String")
+    - version.Version @source("symbol:Version")
+
+  Invariants:
+    - Version metadata MUST be available without observing a filesystem path.
+    - Empty build metadata MUST fall back to dev.
+
+  Scenario (happy-path): Build-stamped version
+    Given build ldflags set Version
+    When version.String is called
+    Then the returned value includes that version
+
+  Scenario (negative): Missing build metadata
+    Given no build metadata is set
+    When version.String is called
+    Then the returned value is dev

@@ -1,0 +1,34 @@
+@owner: Loupe
+@stability: stable
+@since: 2026-06-15
+@reviewed: 2026-06-15
+
+Feature: Loupe JSON Schema
+  "Defines the stable typed JSON records emitted by loupe."
+
+  Provides:
+    - schema.Node @source("symbol:Node")
+    - schema.Context @source("symbol:Context")
+    - schema.AgentNote @source("symbol:AgentNote")
+
+  Invariants:
+    - Node sizes MUST be encoded as integer bytes.
+    - Node modification times MUST be encoded as Unix epoch integers.
+    - Node permissions MUST be encoded as plain octal strings.
+    - Node types MUST be one of file, directory, symlink, or other.
+    - Directory recursion MUST be represented as nested Node entries.
+
+  Scenario (happy-path): Directory node
+    Given a directory with entries
+    When it is encoded
+    Then the JSON contains directory metadata and a nested entries array
+
+  Scenario (happy-path): Agent context
+    Given context enrichment exists
+    When it is encoded
+    Then the JSON contains a context object with typed fields
+
+  Scenario (negative): Empty optional fields
+    Given a node has no symlink target, extension, entries, or context
+    When it is encoded
+    Then those optional fields are omitted from JSON

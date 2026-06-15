@@ -1,0 +1,51 @@
+@owner: Loupe
+@stability: stable
+@since: 2026-06-15
+@reviewed: 2026-06-15
+
+Feature: Command-Line Interface
+  "Parses loupe flags, observes a path, and writes the requested output format."
+
+  Provides:
+    - cli.Run @source("symbol:Run")
+
+  Consumes:
+    - context.Enrich
+    - observe.Observe
+    - schema.Node
+    - version.String
+
+  Invariants:
+    - JSON output MUST be the default output.
+    - Version output MUST NOT require a path argument.
+    - Command errors MUST be written to stderr.
+    - Successful output MUST be written to stdout.
+    - Flags MUST be accepted before or after the path argument.
+    - A -- argument MUST end flag parsing so dash-prefixed paths can be observed.
+    - The default depth MUST be 1 for directories and 0 for files.
+    - The human output mode MUST be exceptional and opt-in.
+
+  Scenario (happy-path): JSON directory observation
+    Given a directory path
+    When loupe runs without --human
+    Then it writes a JSON node to stdout
+
+  Scenario (happy-path): Version output
+    Given --version
+    When loupe runs
+    Then it writes the build version to stdout without observing a path
+
+  Scenario (negative): Invalid type flag
+    Given an unsupported --type value
+    When loupe runs
+    Then it writes an error to stderr and returns an error
+
+  Scenario (happy-path): Path before flags
+    Given a path followed by --depth
+    When loupe runs
+    Then the flag is applied to the observation
+
+  Scenario (happy-path): Dash-prefixed path
+    Given -- followed by a path beginning with a dash
+    When loupe runs
+    Then the path is observed rather than parsed as a flag
