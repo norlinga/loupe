@@ -50,7 +50,8 @@ func Run(args []string, stdout io.Writer, stderr io.Writer) error {
 	}
 	parsedType, err := observe.ParseType(*typeFilter)
 	if err != nil {
-		fmt.Fprintf(stderr, "unsupported --type %q\n", *typeFilter)
+		err = fmt.Errorf("unsupported --type %q", *typeFilter)
+		fmt.Fprintln(stderr, err)
 		return err
 	}
 	node, err := observe.Observe(path, observe.Options{

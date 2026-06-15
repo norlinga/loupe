@@ -60,6 +60,7 @@ func Serve(stdin io.Reader, stdout io.Writer) error {
 		if err := json.Unmarshal(line, &req); err != nil {
 			if err := writeResponse(writer, response{
 				JSONRPC: "2.0",
+				ID:      json.RawMessage("null"),
 				Error:   &rpcError{Code: -32700, Message: "parse error"},
 			}); err != nil {
 				return err

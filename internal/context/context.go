@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/norlinga/loupe/internal/gitroot"
 	"github.com/norlinga/loupe/internal/notes"
 	"github.com/norlinga/loupe/internal/schema"
 )
@@ -28,7 +29,7 @@ func Enrich(node *schema.Node, opts Options) {
 	if opts.RecentlyModifiedLimit <= 0 {
 		opts.RecentlyModifiedLimit = 20
 	}
-	root := nearestGitRoot(node.Path)
+	root := gitroot.Nearest(node.Path)
 	if root == "" {
 		root = projectSearchStart(node.Path)
 	}
@@ -44,20 +45,6 @@ func Enrich(node *schema.Node, opts Options) {
 		ctx.AgentNotes = agentNotes
 	}
 	node.Context = ctx
-}
-
-func nearestGitRoot(path string) string {
-	dir := projectSearchStart(path)
-	for {
-		if hasPath(filepath.Join(dir, ".git")) {
-			return dir
-		}
-		parent := filepath.Dir(dir)
-		if parent == dir {
-			return ""
-		}
-		dir = parent
-	}
 }
 
 func projectSearchStart(path string) string {

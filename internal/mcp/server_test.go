@@ -73,6 +73,25 @@ func TestServeHandlesInitializeToolsListAndCall(t *testing.T) {
 	}
 }
 
+func TestServeReturnsParseErrorForMalformedJSON(t *testing.T) {
+	var out bytes.Buffer
+	input := `{not json}` + "\n"
+
+	if err := Serve(strings.NewReader(input), &out); err != nil {
+		t.Fatal(err)
+	}
+	responses := decodeResponses(t, out.String())
+	if len(responses) != 1 {
+		t.Fatalf("response count = %d, want 1", len(responses))
+	}
+	if responses[0].Error == nil || responses[0].Error.Code != -32700 {
+		t.Fatalf("error = %#v, want parse error -32700", responses[0].Error)
+	}
+	if string(responses[0].ID) != "null" {
+		t.Fatalf("id = %s, want null", responses[0].ID)
+	}
+}
+
 func TestServeReturnsMethodNotFound(t *testing.T) {
 	var out bytes.Buffer
 	input := `{"jsonrpc":"2.0","id":1,"method":"unknown","params":{}}` + "\n"

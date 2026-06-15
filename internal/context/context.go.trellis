@@ -11,6 +11,7 @@ Feature: Observation Context
     - context.Options @source("symbol:Options")
 
   Consumes:
+    - gitroot.Nearest
     - notes.ReadNearest
     - schema.Context
     - schema.Node

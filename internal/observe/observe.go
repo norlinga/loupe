@@ -37,12 +37,9 @@ func Observe(path string, opts Options) (*schema.Node, error) {
 	if opts.Now.IsZero() {
 		opts.Now = time.Now()
 	}
-	node, include, err := observePath(abs, info, opts, opts.Depth, true)
+	node, _, err := observePath(abs, info, opts, opts.Depth, true)
 	if err != nil {
 		return nil, err
-	}
-	if !include {
-		return node, nil
 	}
 	return node, nil
 }

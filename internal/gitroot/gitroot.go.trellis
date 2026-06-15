@@ -1,0 +1,26 @@
+@owner: Loupe
+@stability: stable
+@since: 2026-06-15
+@reviewed: 2026-06-15
+
+Feature: Git Root Discovery
+  "Locates the nearest git project root by walking up from a given path."
+
+  Provides:
+    - gitroot.Nearest @source("symbol:Nearest")
+
+  Invariants:
+    - Discovery MUST walk upward from the given path toward the filesystem root.
+    - When the path is a file, the walk MUST begin from its parent directory.
+    - A directory containing .git MUST be returned as the project root.
+    - When no .git ancestor exists, the empty string MUST be returned.
+
+  Scenario (happy-path): File inside git repo
+    Given a file path inside a git-tracked directory
+    When Nearest runs
+    Then the containing project root directory is returned
+
+  Scenario (negative): Path outside any git repo
+    Given a path with no .git ancestor
+    When Nearest runs
+    Then an empty string is returned

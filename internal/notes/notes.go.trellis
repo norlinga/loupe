@@ -10,6 +10,7 @@ Feature: Agent Notes
     - notes.ReadNearest @source("symbol:ReadNearest")
 
   Consumes:
+    - gitroot.Nearest
     - schema.AgentNote
 
   Invariants:

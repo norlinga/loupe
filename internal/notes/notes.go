@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/norlinga/loupe/internal/gitroot"
 	"github.com/norlinga/loupe/internal/schema"
 )
 
@@ -16,7 +17,7 @@ type file struct {
 }
 
 func ReadNearest(path string) ([]schema.AgentNote, bool) {
-	root := nearestGitRoot(path)
+	root := gitroot.Nearest(path)
 	if root == "" {
 		return nil, false
 	}
@@ -34,20 +35,3 @@ func ReadNearest(path string) ([]schema.AgentNote, bool) {
 	return parsed.Notes, true
 }
 
-func nearestGitRoot(path string) string {
-	dir := path
-	info, err := os.Lstat(path)
-	if err == nil && !info.IsDir() {
-		dir = filepath.Dir(path)
-	}
-	for {
-		if _, err := os.Stat(filepath.Join(dir, ".git")); err == nil {
-			return dir
-		}
-		parent := filepath.Dir(dir)
-		if parent == dir {
-			return ""
-		}
-		dir = parent
-	}
-}
