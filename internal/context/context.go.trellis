@@ -22,6 +22,7 @@ Feature: Observation Context
     - Recently modified paths MUST be relative to the project root.
     - Recently modified paths MUST be sorted newest first with lexical order as a tie-breaker.
     - Recently modified paths MUST be capped to the configured limit.
+    - Recently modified paths MUST exclude hidden path components when NoHidden is set.
     - Agent notes MUST be omitted when no valid notes file exists.
 
   Scenario (happy-path): Go project
@@ -33,6 +34,11 @@ Feature: Observation Context
     Given several files modified inside the recent window
     When context enrichment runs
     Then recently_modified contains the newest relative paths first up to the limit
+
+  Scenario (happy-path): Hidden recent paths
+    Given NoHidden is set
+    When context enrichment runs
+    Then hidden recently modified paths are omitted
 
   Scenario (negative): Missing notes
     Given no .loupe/notes.json exists

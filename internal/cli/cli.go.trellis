@@ -11,12 +11,13 @@ Feature: Command-Line Interface
 
   Consumes:
     - context.Enrich
+    - mcp.Serve
     - observe.Observe
-    - schema.Node
     - version.String
 
   Invariants:
     - JSON output MUST be the default output.
+    - MCP server mode MUST NOT require a path argument.
     - Version output MUST NOT require a path argument.
     - Command errors MUST be written to stderr.
     - Successful output MUST be written to stdout.
@@ -34,6 +35,11 @@ Feature: Command-Line Interface
     Given --version
     When loupe runs
     Then it writes the build version to stdout without observing a path
+
+  Scenario (happy-path): MCP server mode
+    Given --mcp
+    When loupe runs
+    Then it serves MCP requests over stdin and stdout without observing a path
 
   Scenario (negative): Invalid type flag
     Given an unsupported --type value

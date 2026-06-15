@@ -23,6 +23,7 @@ loupe ./main.go
 - `--context`: include project context such as VCS, project type, recently modified files, and agent notes.
 - `--human`: print a minimal human-readable tree.
 - `--version`: print the build version and exit.
+- `--mcp`: serve loupe as a stdio MCP server.
 
 Flags may appear before or after the path. Use `--` before paths that begin with `-`.
 
@@ -73,6 +74,27 @@ When `--context` is used, `loupe` looks for `.loupe/notes.json` at the nearest g
   ]
 }
 ```
+
+## MCP
+
+`loupe --mcp` starts a stdio MCP server exposing one tool:
+
+- `loupe_observe`: observes a local filesystem path and returns loupe JSON as text content.
+
+Tool arguments:
+
+```json
+{
+  "path": ".",
+  "depth": 2,
+  "type": "file",
+  "newer_than": 300,
+  "no_hidden": true,
+  "context": true
+}
+```
+
+Only `path` is required. The MCP tool preserves the same nested output, filtering, symlink, and context semantics as the CLI.
 
 ## Development
 

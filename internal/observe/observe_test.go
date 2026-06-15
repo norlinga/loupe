@@ -217,6 +217,19 @@ func TestUnreadableDescendantFailsObservation(t *testing.T) {
 	}
 }
 
+func TestParseType(t *testing.T) {
+	got, err := ParseType("dir")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got != schema.TypeDirectory {
+		t.Fatalf("ParseType(dir) = %q, want directory", got)
+	}
+	if _, err := ParseType("socket"); err == nil {
+		t.Fatal("ParseType(socket) returned nil error")
+	}
+}
+
 func writeFile(t *testing.T, path string, content string) {
 	t.Helper()
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {

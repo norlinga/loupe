@@ -1,0 +1,43 @@
+@owner: Loupe
+@stability: stable
+@since: 2026-06-15
+@reviewed: 2026-06-15
+
+Feature: MCP Server
+  "Exposes loupe observation as a stdio MCP tool for agent integrations."
+
+  Provides:
+    - mcp.Serve @source("symbol:Serve")
+    - mcp.CallObserve @source("symbol:CallObserve")
+
+  Consumes:
+    - context.Enrich
+    - observe.Observe
+    - observe.ParseType
+    - version.String
+
+  Invariants:
+    - The server MUST speak JSON-RPC messages over newline-delimited stdio.
+    - The server MUST expose a loupe_observe tool.
+    - Tool results MUST return loupe JSON as text content.
+    - Tool input MUST support path, depth, type, newer_than, no_hidden, and context.
+    - Observation failures MUST be returned as MCP tool errors rather than partial JSON.
+
+  OutOfScope:
+    - Network transports.
+    - Querying or transforming loupe output beyond existing observation options.
+
+  Scenario (happy-path): Tool listing
+    Given an MCP client requests tools/list
+    When the server handles the request
+    Then loupe_observe is returned with its input schema
+
+  Scenario (happy-path): Observe call
+    Given an MCP client calls loupe_observe with a path
+    When observation succeeds
+    Then the tool result contains loupe JSON text
+
+  Scenario (negative): Invalid tool arguments
+    Given the path argument is missing
+    When the tool is called
+    Then an MCP error response is returned

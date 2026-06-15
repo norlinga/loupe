@@ -81,6 +81,23 @@ func TestEnrichSortsAndCapsRecentlyModified(t *testing.T) {
 	}
 }
 
+func TestEnrichNoHiddenExcludesHiddenRecentPaths(t *testing.T) {
+	root := t.TempDir()
+	now := time.Unix(1_700_000_000, 0)
+	mkdir(t, filepath.Join(root, ".git"))
+	writeFile(t, filepath.Join(root, "visible.go"), "package main")
+	writeFile(t, filepath.Join(root, ".hidden", "secret.go"), "package main")
+	setModTime(t, filepath.Join(root, "visible.go"), now.Add(-10*time.Second))
+	setModTime(t, filepath.Join(root, ".hidden", "secret.go"), now.Add(-5*time.Second))
+
+	node := &schema.Node{Path: root}
+	Enrich(node, Options{Now: now, RecentlyModifiedSecs: 300, NoHidden: true})
+
+	if !reflect.DeepEqual(node.Context.RecentlyModified, []string{"visible.go"}) {
+		t.Fatalf("RecentlyModified = %#v, want visible.go only", node.Context.RecentlyModified)
+	}
+}
+
 func mkdir(t *testing.T, path string) {
 	t.Helper()
 	if err := os.MkdirAll(path, 0o755); err != nil {

@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/norlinga/loupe/internal/notes"
@@ -14,6 +15,7 @@ type Options struct {
 	Now                   time.Time
 	RecentlyModifiedSecs  int64
 	RecentlyModifiedLimit int
+	NoHidden              bool
 }
 
 func Enrich(node *schema.Node, opts Options) {
@@ -33,7 +35,7 @@ func Enrich(node *schema.Node, opts Options) {
 	ctx := &schema.Context{
 		ProjectType:          projectType(root),
 		RecentlyModifiedSecs: opts.RecentlyModifiedSecs,
-		RecentlyModified:     recentlyModified(root, opts.Now, time.Duration(opts.RecentlyModifiedSecs)*time.Second, opts.RecentlyModifiedLimit),
+		RecentlyModified:     recentlyModified(root, opts.Now, time.Duration(opts.RecentlyModifiedSecs)*time.Second, opts.RecentlyModifiedLimit, opts.NoHidden),
 	}
 	if hasPath(filepath.Join(root, ".git")) {
 		ctx.VCS = "git"
@@ -86,7 +88,7 @@ type recentPath struct {
 	modTime time.Time
 }
 
-func recentlyModified(root string, now time.Time, window time.Duration, limit int) []string {
+func recentlyModified(root string, now time.Time, window time.Duration, limit int, noHidden bool) []string {
 	var paths []recentPath
 	_ = filepath.WalkDir(root, func(path string, entry os.DirEntry, err error) error {
 		if err != nil || path == root {
@@ -95,6 +97,12 @@ func recentlyModified(root string, now time.Time, window time.Duration, limit in
 		name := entry.Name()
 		if entry.IsDir() && (name == ".git" || name == ".loupe") {
 			return filepath.SkipDir
+		}
+		if noHidden && strings.HasPrefix(name, ".") {
+			if entry.IsDir() {
+				return filepath.SkipDir
+			}
+			return nil
 		}
 		info, err := entry.Info()
 		if err != nil || info.IsDir() {

@@ -9,6 +9,7 @@ Feature: Filesystem Observation
   Provides:
     - observe.Observe @source("symbol:Observe")
     - observe.Options @source("symbol:Options")
+    - observe.ParseType @source("symbol:ParseType")
 
   Consumes:
     - schema.Node
@@ -47,3 +48,8 @@ Feature: Filesystem Observation
     Given a descendant cannot be inspected
     When observation runs
     Then an error is returned instead of partial output
+
+  Scenario (negative): Unsupported type filter
+    Given an unsupported type filter value
+    When ParseType runs
+    Then an error is returned

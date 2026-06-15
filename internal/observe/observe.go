@@ -47,6 +47,21 @@ func Observe(path string, opts Options) (*schema.Node, error) {
 	return node, nil
 }
 
+func ParseType(value string) (schema.EntryType, error) {
+	switch strings.ToLower(value) {
+	case "":
+		return "", nil
+	case "file":
+		return schema.TypeFile, nil
+	case "dir", "directory":
+		return schema.TypeDirectory, nil
+	case "symlink":
+		return schema.TypeSymlink, nil
+	default:
+		return "", fmt.Errorf("unsupported type %q", value)
+	}
+}
+
 func observePath(path string, info os.FileInfo, opts Options, depth int, root bool) (*schema.Node, bool, error) {
 	node := nodeFromInfo(path, info)
 	if node.Type == schema.TypeSymlink {

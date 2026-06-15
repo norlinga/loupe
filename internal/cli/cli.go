@@ -6,10 +6,12 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"os"
 	"strings"
 	"time"
 
 	loupecontext "github.com/norlinga/loupe/internal/context"
+	"github.com/norlinga/loupe/internal/mcp"
 	"github.com/norlinga/loupe/internal/observe"
 	"github.com/norlinga/loupe/internal/schema"
 	"github.com/norlinga/loupe/internal/version"
@@ -25,6 +27,7 @@ func Run(args []string, stdout io.Writer, stderr io.Writer) error {
 	withContext := fs.Bool("context", false, "add semantic enrichment layer")
 	human := fs.Bool("human", false, "human-readable output")
 	showVersion := fs.Bool("version", false, "print version")
+	serveMCP := fs.Bool("mcp", false, "serve MCP over stdio")
 	flagArgs, path, err := splitArgs(args)
 	if err != nil {
 		fmt.Fprintln(stderr, err)
@@ -32,6 +35,9 @@ func Run(args []string, stdout io.Writer, stderr io.Writer) error {
 	}
 	if err := fs.Parse(flagArgs); err != nil {
 		return err
+	}
+	if *serveMCP {
+		return mcp.Serve(os.Stdin, stdout)
 	}
 	if *showVersion {
 		fmt.Fprintln(stdout, version.String())
@@ -42,9 +48,9 @@ func Run(args []string, stdout io.Writer, stderr io.Writer) error {
 		fmt.Fprintln(stderr, err)
 		return err
 	}
-	parsedType, err := parseType(*typeFilter)
+	parsedType, err := observe.ParseType(*typeFilter)
 	if err != nil {
-		fmt.Fprintln(stderr, err)
+		fmt.Fprintf(stderr, "unsupported --type %q\n", *typeFilter)
 		return err
 	}
 	node, err := observe.Observe(path, observe.Options{
@@ -58,7 +64,7 @@ func Run(args []string, stdout io.Writer, stderr io.Writer) error {
 		return err
 	}
 	if *withContext {
-		loupecontext.Enrich(node, loupecontext.Options{})
+		loupecontext.Enrich(node, loupecontext.Options{NoHidden: *noHidden})
 	}
 	if *human {
 		writeHuman(stdout, *node, 0)
@@ -113,21 +119,6 @@ func flagNeedsValue(arg string) bool {
 		return true
 	default:
 		return false
-	}
-}
-
-func parseType(value string) (schema.EntryType, error) {
-	switch strings.ToLower(value) {
-	case "":
-		return "", nil
-	case "file":
-		return schema.TypeFile, nil
-	case "dir", "directory":
-		return schema.TypeDirectory, nil
-	case "symlink":
-		return schema.TypeSymlink, nil
-	default:
-		return "", fmt.Errorf("unsupported --type %q", value)
 	}
 }
 
