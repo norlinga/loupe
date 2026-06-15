@@ -1,8 +1,9 @@
 VERSION ?= dev
 GOOS ?= $(shell go env GOOS)
 GOARCH ?= $(shell go env GOARCH)
+PREFIX ?= /usr/local
 
-.PHONY: test bench build release trellis-lint
+.PHONY: test bench build install release trellis-lint
 
 test:
 	go test ./...
@@ -13,6 +14,10 @@ bench:
 build:
 	mkdir -p bin
 	CGO_ENABLED=0 go build -trimpath -ldflags "-X github.com/norlinga/loupe/internal/version.Version=$(VERSION)" -o bin/loupe .
+
+install: build
+	install -d "$(DESTDIR)$(PREFIX)/bin"
+	install -m 0755 bin/loupe "$(DESTDIR)$(PREFIX)/bin/loupe"
 
 release:
 	mkdir -p dist

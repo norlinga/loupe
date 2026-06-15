@@ -12,13 +12,14 @@ Feature: MCP Server
 
   Consumes:
     - context.Enrich
+    - docs.EmbeddedSchemas
     - observe.Observe
     - observe.ParseType
-    - version.String
 
   Invariants:
     - The server MUST speak JSON-RPC messages over newline-delimited stdio.
     - The server MUST expose a loupe_observe tool.
+    - The server MUST expose tools for loupe output and notes schemas.
     - Tool results MUST return loupe JSON as text content.
     - Tool input MUST support path, depth, type, newer_than, no_hidden, and context.
     - Observation failures MUST be returned as MCP tool errors rather than partial JSON.
@@ -36,6 +37,11 @@ Feature: MCP Server
     Given an MCP client calls loupe_observe with a path
     When observation succeeds
     Then the tool result contains loupe JSON text
+
+  Scenario (happy-path): Schema call
+    Given an MCP client calls loupe_output_schema
+    When the server handles the request
+    Then the tool result contains the embedded output JSON Schema
 
   Scenario (negative): Invalid tool arguments
     Given the path argument is missing

@@ -14,7 +14,6 @@ Feature: Command-Line Interface
     - docs.EmbeddedSchemas
     - mcp.Serve
     - observe.Observe
-    - version.String
 
   Invariants:
     - JSON output MUST be the default output.

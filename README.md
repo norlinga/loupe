@@ -14,6 +14,19 @@ loupe ./internal --context | jq '.context'
 loupe ./main.go
 ```
 
+## Harness Quickstart
+
+Build and verify locally:
+
+```sh
+make build VERSION=dev
+./bin/loupe --help
+./bin/loupe --schema
+./bin/loupe --notes-schema
+```
+
+Use `loupe --mcp` for stdio MCP integration. See [docs/harness.md](docs/harness.md) for a full copy-paste setup, including MCP configuration and the reusable Codex skill.
+
 ## Flags
 
 - `--depth N`: recurse `N` levels deep. Defaults to `1` for directories and `0` for files.
@@ -93,9 +106,11 @@ loupe --notes-schema
 
 ## MCP
 
-`loupe --mcp` starts a stdio MCP server exposing one tool:
+`loupe --mcp` starts a stdio MCP server exposing these tools:
 
 - `loupe_observe`: observes a local filesystem path and returns loupe JSON as text content.
+- `loupe_output_schema`: returns the output JSON Schema.
+- `loupe_notes_schema`: returns the `.loupe/notes.json` JSON Schema.
 
 Tool arguments:
 

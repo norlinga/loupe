@@ -1,0 +1,4 @@
+interface:
+  display_name: "Loupe"
+  short_description: "Use loupe for structured filesystem observation."
+  default_prompt: "Use loupe to inspect local filesystem state with typed JSON."

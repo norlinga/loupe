@@ -65,11 +65,35 @@ func TestServeHandlesInitializeToolsListAndCall(t *testing.T) {
 	if !strings.Contains(string(responses[1].Result), "loupe_observe") {
 		t.Fatalf("tools/list result = %s", responses[1].Result)
 	}
+	if !strings.Contains(string(responses[1].Result), "loupe_output_schema") {
+		t.Fatalf("tools/list result = %s", responses[1].Result)
+	}
 	if responses[2].Error != nil {
 		t.Fatalf("tools/call error = %#v", responses[2].Error)
 	}
 	if !strings.Contains(string(responses[2].Result), `main.go`) {
 		t.Fatalf("tools/call result = %s", responses[2].Result)
+	}
+}
+
+func TestCallSchemaTools(t *testing.T) {
+	for _, tc := range []struct {
+		name string
+		want string
+	}{
+		{name: "loupe_output_schema", want: `"title": "loupe output"`},
+		{name: "loupe_notes_schema", want: `"title": "loupe agent notes"`},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			params := json.RawMessage(`{"name":"` + tc.name + `","arguments":{}}`)
+			result, err := handleToolCall(params)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !strings.Contains(resultText(t, result), tc.want) {
+				t.Fatalf("result = %#v, want %s", result, tc.want)
+			}
+		})
 	}
 }
 

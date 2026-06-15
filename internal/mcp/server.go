@@ -10,6 +10,7 @@ import (
 	"time"
 
 	loupecontext "github.com/norlinga/loupe/internal/context"
+	"github.com/norlinga/loupe/internal/docs"
 	"github.com/norlinga/loupe/internal/observe"
 	"github.com/norlinga/loupe/internal/version"
 )
@@ -129,7 +130,25 @@ func toolsListResult() map[string]any {
 					},
 				},
 			},
+			{
+				"name":        "loupe_output_schema",
+				"description": "Return the JSON Schema for loupe observation output.",
+				"inputSchema": emptyInputSchema(),
+			},
+			{
+				"name":        "loupe_notes_schema",
+				"description": "Return the JSON Schema for .loupe/notes.json.",
+				"inputSchema": emptyInputSchema(),
+			},
 		},
+	}
+}
+
+func emptyInputSchema() map[string]any {
+	return map[string]any{
+		"type":                 "object",
+		"properties":           map[string]any{},
+		"additionalProperties": false,
 	}
 }
 
@@ -138,10 +157,16 @@ func handleToolCall(params json.RawMessage) (map[string]any, error) {
 	if err := json.Unmarshal(params, &call); err != nil {
 		return nil, err
 	}
-	if call.Name != "loupe_observe" {
+	switch call.Name {
+	case "loupe_observe":
+		return CallObserve(call.Arguments)
+	case "loupe_output_schema":
+		return toolText(docs.OutputSchema()), nil
+	case "loupe_notes_schema":
+		return toolText(docs.NotesSchema()), nil
+	default:
 		return nil, fmt.Errorf("unknown tool %q", call.Name)
 	}
-	return CallObserve(call.Arguments)
 }
 
 func CallObserve(raw json.RawMessage) (map[string]any, error) {

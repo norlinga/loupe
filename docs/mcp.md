@@ -1,6 +1,6 @@
 # MCP Integration
 
-`loupe --mcp` starts a stdio MCP server that exposes one tool: `loupe_observe`.
+`loupe --mcp` starts a stdio MCP server.
 
 ## Generic Client Configuration
 
@@ -32,7 +32,13 @@ During local development, point at the workspace build:
 
 ## Tool
 
-`loupe_observe` observes a local filesystem path and returns loupe JSON as MCP text content.
+Tools:
+
+- `loupe_observe`: observes a local filesystem path and returns loupe JSON as MCP text content.
+- `loupe_output_schema`: returns the JSON Schema for loupe output.
+- `loupe_notes_schema`: returns the JSON Schema for `.loupe/notes.json`.
+
+## `loupe_observe`
 
 Input schema:
 
@@ -58,7 +64,7 @@ Fields:
 - `no_hidden`: exclude hidden entries and hidden recent context paths.
 - `context`: include project context.
 
-The MCP tool preserves the same output contract documented in [schema.md](schema.md).
+The observe tool preserves the same output contract documented in [schema.md](schema.md).
 
 ## Example JSON-RPC Call
 
