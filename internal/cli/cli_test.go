@@ -118,6 +118,51 @@ func TestRunVersionDoesNotRequirePath(t *testing.T) {
 	}
 }
 
+func TestRunSchemaDoesNotRequirePath(t *testing.T) {
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+
+	if err := Run([]string{"--schema"}, &stdout, &stderr); err != nil {
+		t.Fatalf("Run error = %v, stderr = %s", err, stderr.String())
+	}
+	if !bytes.Contains(stdout.Bytes(), []byte(`"$schema"`)) {
+		t.Fatalf("stdout = %q, want JSON Schema", stdout.String())
+	}
+	if stderr.Len() != 0 {
+		t.Fatalf("stderr = %q, want empty", stderr.String())
+	}
+}
+
+func TestRunNotesSchemaDoesNotRequirePath(t *testing.T) {
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+
+	if err := Run([]string{"--notes-schema"}, &stdout, &stderr); err != nil {
+		t.Fatalf("Run error = %v, stderr = %s", err, stderr.String())
+	}
+	if !bytes.Contains(stdout.Bytes(), []byte(`"schema_version"`)) {
+		t.Fatalf("stdout = %q, want notes JSON Schema", stdout.String())
+	}
+	if stderr.Len() != 0 {
+		t.Fatalf("stderr = %q, want empty", stderr.String())
+	}
+}
+
+func TestRunHelpDoesNotRequirePath(t *testing.T) {
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+
+	if err := Run([]string{"--help"}, &stdout, &stderr); err != nil {
+		t.Fatalf("Run error = %v, stderr = %s", err, stderr.String())
+	}
+	if !bytes.Contains(stdout.Bytes(), []byte("Examples:")) {
+		t.Fatalf("stdout = %q, want examples", stdout.String())
+	}
+	if stderr.Len() != 0 {
+		t.Fatalf("stderr = %q, want empty", stderr.String())
+	}
+}
+
 func TestRunRejectsInvalidType(t *testing.T) {
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer

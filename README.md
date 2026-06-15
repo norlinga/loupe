@@ -22,6 +22,8 @@ loupe ./main.go
 - `--no-hidden`: exclude dotfile entries.
 - `--context`: include project context such as VCS, project type, recently modified files, and agent notes.
 - `--human`: print a minimal human-readable tree.
+- `--schema`: print the JSON Schema and exit.
+- `--notes-schema`: print the `.loupe/notes.json` JSON Schema and exit.
 - `--version`: print the build version and exit.
 - `--mcp`: serve loupe as a stdio MCP server.
 
@@ -56,6 +58,14 @@ Directory recursion is nested. Each directory entry may contain its own `entries
 
 Entries are emitted in lexical filename order. If traversal encounters an unreadable descendant, `loupe` returns an error instead of partial JSON. Broken symlinks are still reported as symlinks with their unresolved target path.
 
+See [docs/schema.md](docs/schema.md) and [docs/loupe.schema.json](docs/loupe.schema.json) for the full output contract.
+
+Distributed binaries also expose the schema directly:
+
+```sh
+loupe --schema
+```
+
 ## Agent Notes
 
 When `--context` is used, `loupe` looks for `.loupe/notes.json` at the nearest git project root. Malformed notes are skipped silently.
@@ -73,6 +83,12 @@ When `--context` is used, `loupe` looks for `.loupe/notes.json` at the nearest g
     }
   ]
 }
+```
+
+Distributed binaries expose this authoring contract directly:
+
+```sh
+loupe --notes-schema
 ```
 
 ## MCP
@@ -95,6 +111,8 @@ Tool arguments:
 ```
 
 Only `path` is required. The MCP tool preserves the same nested output, filtering, symlink, and context semantics as the CLI.
+
+See [docs/mcp.md](docs/mcp.md) for client configuration examples.
 
 ## Development
 

@@ -3,6 +3,7 @@ package notes
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -35,6 +36,16 @@ func TestReadNearestSkipsMalformedNotes(t *testing.T) {
 	notes, ok := ReadNearest(root)
 	if ok {
 		t.Fatalf("ok = true, notes = %#v", notes)
+	}
+}
+
+func TestEmbeddedJSONSchemaMatchesDocs(t *testing.T) {
+	data, err := os.ReadFile(filepath.Join("..", "..", "docs", "notes.schema.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.TrimSpace(JSONSchema) != strings.TrimSpace(string(data)) {
+		t.Fatal("embedded JSONSchema differs from docs/notes.schema.json")
 	}
 }
 

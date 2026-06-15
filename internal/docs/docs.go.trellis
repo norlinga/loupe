@@ -1,0 +1,35 @@
+@owner: Loupe
+@stability: stable
+@since: 2026-06-15
+@reviewed: 2026-06-15
+
+Feature: Embedded Documentation
+  "Provides binary-discoverable schema documents."
+
+  Provides:
+    - docs.EmbeddedSchemas @source("symbol:OutputSchema")
+    - docs.OutputSchema @source("symbol:OutputSchema")
+    - docs.NotesSchema @source("symbol:NotesSchema")
+
+  Consumes:
+    - notes.JSONSchema
+    - schema.JSONSchema
+
+  Invariants:
+    - OutputSchema MUST return the loupe output JSON Schema.
+    - NotesSchema MUST return the .loupe/notes.json JSON Schema.
+
+  Scenario (happy-path): Output schema
+    Given a distributed binary
+    When OutputSchema is printed
+    Then the loupe output contract is available without repository files
+
+  Scenario (happy-path): Notes schema
+    Given a distributed binary
+    When NotesSchema is printed
+    Then the agent notes authoring contract is available without repository files
+
+  Scenario (negative): Repository docs missing
+    Given repository documentation files are not present beside the binary
+    When embedded schema functions are called
+    Then schema content is still returned

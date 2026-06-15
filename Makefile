@@ -19,4 +19,4 @@ release:
 	CGO_ENABLED=0 GOOS=$(GOOS) GOARCH=$(GOARCH) go build -trimpath -ldflags "-s -w -X github.com/norlinga/loupe/internal/version.Version=$(VERSION)" -o dist/loupe-$(GOOS)-$(GOARCH) .
 
 trellis-lint:
-	trellis lint main.go.trellis internal/schema/schema.go.trellis internal/observe/observe.go.trellis internal/context/context.go.trellis internal/notes/notes.go.trellis internal/gitroot/gitroot.go.trellis internal/version/version.go.trellis internal/mcp/server.go.trellis internal/cli/cli.go.trellis
+	trellis lint main.go.trellis internal/schema/schema.go.trellis internal/observe/observe.go.trellis internal/context/context.go.trellis internal/notes/notes.go.trellis internal/gitroot/gitroot.go.trellis internal/docs/docs.go.trellis internal/version/version.go.trellis internal/mcp/server.go.trellis internal/cli/cli.go.trellis

@@ -10,6 +10,7 @@ Feature: Loupe JSON Schema
     - schema.Node @source("symbol:Node")
     - schema.Context @source("symbol:Context")
     - schema.AgentNote @source("symbol:AgentNote")
+    - schema.JSONSchema @source("symbol:JSONSchema")
 
   Invariants:
     - Node sizes MUST be encoded as integer bytes.
@@ -32,3 +33,8 @@ Feature: Loupe JSON Schema
     Given a node has no symlink target, extension, entries, or context
     When it is encoded
     Then those optional fields are omitted from JSON
+
+  Scenario (happy-path): Embedded schema
+    Given a distributed loupe binary
+    When schema.JSONSchema is printed
+    Then agents can inspect the output contract without repository files

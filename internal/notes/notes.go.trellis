@@ -8,6 +8,7 @@ Feature: Agent Notes
 
   Provides:
     - notes.ReadNearest @source("symbol:ReadNearest")
+    - notes.JSONSchema @source("symbol:JSONSchema")
 
   Consumes:
     - gitroot.Nearest
@@ -28,3 +29,8 @@ Feature: Agent Notes
     Given a malformed notes file
     When notes are read
     Then no notes are returned and observation continues
+
+  Scenario (happy-path): Embedded notes schema
+    Given a distributed loupe binary
+    When notes.JSONSchema is printed
+    Then agents can inspect the .loupe/notes.json authoring contract without repository files

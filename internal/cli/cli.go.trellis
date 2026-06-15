@@ -11,6 +11,7 @@ Feature: Command-Line Interface
 
   Consumes:
     - context.Enrich
+    - docs.EmbeddedSchemas
     - mcp.Serve
     - observe.Observe
     - version.String
@@ -18,7 +19,10 @@ Feature: Command-Line Interface
   Invariants:
     - JSON output MUST be the default output.
     - MCP server mode MUST NOT require a path argument.
+    - Notes schema output MUST NOT require a path argument.
+    - Schema output MUST NOT require a path argument.
     - Version output MUST NOT require a path argument.
+    - Help output MUST NOT require a path argument and MUST exit successfully.
     - Command errors MUST be written to stderr.
     - Successful output MUST be written to stdout.
     - Flags MUST be accepted before or after the path argument.
@@ -36,10 +40,25 @@ Feature: Command-Line Interface
     When loupe runs
     Then it writes the build version to stdout without observing a path
 
+  Scenario (happy-path): Schema output
+    Given --schema
+    When loupe runs
+    Then it writes the embedded JSON Schema to stdout without observing a path
+
+  Scenario (happy-path): Notes schema output
+    Given --notes-schema
+    When loupe runs
+    Then it writes the embedded notes JSON Schema to stdout without observing a path
+
   Scenario (happy-path): MCP server mode
     Given --mcp
     When loupe runs
     Then it serves MCP requests over stdin and stdout without observing a path
+
+  Scenario (happy-path): Help output
+    Given --help
+    When loupe runs
+    Then it writes usage and examples to stdout
 
   Scenario (negative): Invalid type flag
     Given an unsupported --type value

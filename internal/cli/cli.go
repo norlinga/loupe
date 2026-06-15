@@ -11,6 +11,7 @@ import (
 	"time"
 
 	loupecontext "github.com/norlinga/loupe/internal/context"
+	"github.com/norlinga/loupe/internal/docs"
 	"github.com/norlinga/loupe/internal/mcp"
 	"github.com/norlinga/loupe/internal/observe"
 	"github.com/norlinga/loupe/internal/schema"
@@ -20,6 +21,9 @@ import (
 func Run(args []string, stdout io.Writer, stderr io.Writer) error {
 	fs := flag.NewFlagSet("loupe", flag.ContinueOnError)
 	fs.SetOutput(stderr)
+	fs.Usage = func() {
+		writeUsage(stdout)
+	}
 	depth := fs.Int("depth", -1, "recurse N levels deep")
 	typeFilter := fs.String("type", "", "filter entries: file, dir, symlink")
 	newerThan := fs.Int64("newer-than", 0, "only entries modified in the last N seconds")
@@ -27,6 +31,8 @@ func Run(args []string, stdout io.Writer, stderr io.Writer) error {
 	withContext := fs.Bool("context", false, "add semantic enrichment layer")
 	human := fs.Bool("human", false, "human-readable output")
 	showVersion := fs.Bool("version", false, "print version")
+	showSchema := fs.Bool("schema", false, "print JSON Schema")
+	showNotesSchema := fs.Bool("notes-schema", false, "print notes JSON Schema")
 	serveMCP := fs.Bool("mcp", false, "serve MCP over stdio")
 	flagArgs, path, err := splitArgs(args)
 	if err != nil {
@@ -34,10 +40,21 @@ func Run(args []string, stdout io.Writer, stderr io.Writer) error {
 		return err
 	}
 	if err := fs.Parse(flagArgs); err != nil {
+		if errors.Is(err, flag.ErrHelp) {
+			return nil
+		}
 		return err
 	}
 	if *serveMCP {
 		return mcp.Serve(os.Stdin, stdout)
+	}
+	if *showSchema {
+		fmt.Fprintln(stdout, docs.OutputSchema())
+		return nil
+	}
+	if *showNotesSchema {
+		fmt.Fprintln(stdout, docs.NotesSchema())
+		return nil
 	}
 	if *showVersion {
 		fmt.Fprintln(stdout, version.String())
@@ -121,6 +138,37 @@ func flagNeedsValue(arg string) bool {
 	default:
 		return false
 	}
+}
+
+func writeUsage(w io.Writer) {
+	fmt.Fprint(w, `Usage:
+  loupe <path> [flags]
+  loupe --mcp
+  loupe --schema
+  loupe --notes-schema
+  loupe --version
+
+Examples:
+  loupe .
+  loupe ./src --depth 2
+  loupe ./main.go
+  loupe . --context
+  loupe . --depth 2 --type file --no-hidden
+  loupe -- ./-dash-prefixed-path
+
+Flags:
+  --depth N        recurse N levels deep (default: 1 for directories, 0 for files)
+  --type TYPE      filter emitted entries: file, dir, directory, symlink
+  --newer-than N   only emit entries modified in the last N seconds
+  --no-hidden      exclude hidden entries
+  --context        add project context
+  --human          print minimal human-readable output
+  --mcp            serve MCP over stdio
+  --schema         print JSON Schema
+  --notes-schema   print notes JSON Schema
+  --version        print version
+  --help           print this help
+`)
 }
 
 func writeHuman(w io.Writer, node schema.Node, indent int) {

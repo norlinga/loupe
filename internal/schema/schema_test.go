@@ -2,6 +2,9 @@ package schema
 
 import (
 	"encoding/json"
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -38,5 +41,15 @@ func TestNodeJSONUsesTypedFieldsAndOmitsEmptyOptionalFields(t *testing.T) {
 	}
 	if _, ok := decoded["context"]; ok {
 		t.Fatal("context should be omitted when unset")
+	}
+}
+
+func TestEmbeddedJSONSchemaMatchesDocs(t *testing.T) {
+	data, err := os.ReadFile(filepath.Join("..", "..", "docs", "loupe.schema.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.TrimSpace(JSONSchema) != strings.TrimSpace(string(data)) {
+		t.Fatal("embedded JSONSchema differs from docs/loupe.schema.json")
 	}
 }

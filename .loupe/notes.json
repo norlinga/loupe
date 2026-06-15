@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "written_by": "codex",
+  "written_at": 1781501350,
+  "notes": [
+    {
+      "kind": "decision",
+      "summary": "Recursive directory output is nested so agents do not need to reconstruct hierarchy from path strings.",
+      "paths": ["internal/observe/observe.go", "docs/schema.md"]
+    },
+    {
+      "kind": "decision",
+      "summary": "MCP integration is served by the main loupe binary via --mcp rather than a separate executable.",
+      "paths": ["internal/mcp/server.go", "internal/cli/cli.go"]
+    },
+    {
+      "kind": "gotcha",
+      "summary": "Trellis lint is mandatory locally, but CI currently skips sidecar lint when the trellis binary is unavailable on the runner.",
+      "paths": [".github/workflows/ci.yml", "Makefile"]
+    }
+  ]
+}

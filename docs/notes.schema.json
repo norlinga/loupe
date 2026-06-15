@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/norlinga/loupe/docs/notes.schema.json",
+  "title": "loupe agent notes",
+  "type": "object",
+  "required": ["schema_version", "written_by", "written_at", "notes"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "written_by": {
+      "type": "string",
+      "minLength": 1
+    },
+    "written_at": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Unix epoch timestamp in seconds."
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/note"
+      }
+    }
+  },
+  "$defs": {
+    "note": {
+      "type": "object",
+      "required": ["kind", "summary"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["fix", "warning", "decision", "gotcha", "observation"]
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
